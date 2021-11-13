@@ -20,6 +20,7 @@ async function run() {
       const database = client.db("watch_store");
       const productsCollection = database.collection("watchproducts");
       const orderCollection = database.collection("order");
+      const reviewCollection = database.collection("review")
       
     //Get Api
     app.get('/products', async (req, res) => {
@@ -27,6 +28,15 @@ async function run() {
         const product = await cursor.toArray();
         res.send(product);
     })
+
+    //Get Review Api
+
+    app.get('/review', async (req, res) => {
+      const cursor = reviewCollection.find({});
+      const review = await cursor.toArray();
+      res.send(review);
+  })
+
     //Get single Api
     app.get('/products/:id', async (req, res) => {
         const id = req.params.id;
@@ -43,6 +53,13 @@ async function run() {
        res.json(ordered)
     })
 
+    app.post ('/review',async(req,res)=>{
+      const review = req.body;
+      const personReview = await reviewCollection.insertOne(review);
+      res.json(personReview);
+    })
+
+
     //Get Order
     app.get('/order',async(req,res)=>{
 
@@ -56,7 +73,9 @@ async function run() {
       //Delete Api
       app.delete('/order/:id', async(req,res)=>{
         const id = req.params.id;
+        console.log(id)
         const query = {_id:objectId(id)};
+        console.log(query)
         const deleteOne = await orderCollection.deleteOne(query);
         res.json(deleteOne);
         
