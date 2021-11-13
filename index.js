@@ -45,21 +45,22 @@ async function run() {
 
     //Get Order
     app.get('/order',async(req,res)=>{
+
       const email = req.query.email;
-      const query = {emai:email}
-        const cursor = orderCollection.find(query);
-        const order = await cursor.toArray();
-        res.send(order);
+      const query = {email: email};
+      const cursor = orderCollection.find(query)
+      const mineOrder = await cursor.toArray();
+      res.json(mineOrder)
     })
 
-    //   //Delete Api
-    //   app.delete('/order/:id', async(req,res)=>{
-    //     const id = req.params.id;
-    //     const query = {_id:objectId(id)};
-    //     const deleteOne = await orderCollection.deleteOne(query);
-    //     res.json(deleteOne);
+      //Delete Api
+      app.delete('/order/:id', async(req,res)=>{
+        const id = req.params.id;
+        const query = {_id:objectId(id)};
+        const deleteOne = await orderCollection.deleteOne(query);
+        res.json(deleteOne);
         
-    // })
+    })
 
     
     } finally {
