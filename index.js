@@ -12,7 +12,7 @@ app.use(express.json());
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.gt16r.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-// console.log(uri)
+
 
 async function run() {
     try {
@@ -21,12 +21,19 @@ async function run() {
       const productsCollection = database.collection("watchproducts");
       const orderCollection = database.collection("order");
       const reviewCollection = database.collection("review")
+      const usersCollection = database.collection("users")
       
     //Get Api
     app.get('/products', async (req, res) => {
         const cursor = productsCollection.find({});
         const product = await cursor.toArray();
         res.send(product);
+    })
+
+    app.get('/users', async (req, res) => {
+        const cursor = usersCollection.find({});
+        const result = await cursor.toArray();
+        res.send(result);
     })
 
     //Get Review Api
@@ -45,6 +52,17 @@ async function run() {
         res.json(singleProduct);
 
     })
+
+    app.get('/users/:email', async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      const user = await usersCollection.findOne(query);
+      let isAdmin = false;
+      if (user?.role === 'admin') {
+          isAdmin = true;
+      }
+      res.json({ admin: isAdmin });
+  })
     //post api
 
     app.post('/order', async(req,res)=>{
@@ -57,6 +75,11 @@ async function run() {
       const review = req.body;
       const personReview = await reviewCollection.insertOne(review);
       res.json(personReview);
+    })
+    app.post ('/users',async(req,res)=>{
+      const users = req.body;
+      const result = await usersCollection.insertOne(users);
+      res.json(result);
     })
 
 
@@ -73,14 +96,28 @@ async function run() {
       //Delete Api
       app.delete('/order/:id', async(req,res)=>{
         const id = req.params.id;
-        console.log(id)
         const query = {_id:objectId(id)};
-        console.log(query)
         const deleteOne = await orderCollection.deleteOne(query);
         res.json(deleteOne);
         
     })
 
+    app.put('/users', async (req, res) => {
+      const user = req.body;
+      const filter = { email: user.email };
+      const options = { upsert: true };
+      const updateDoc = { $set: user };
+      const result = await usersCollection.updateOne(filter, updateDoc, options);
+      res.json(result);
+  });
+
+  app.put('/users/admin', async (req, res) => {
+            const user = req.body;
+            const filter = { email: user.email };
+            const updateDoc = { $set: { role: 'admin' } };
+            const result = await usersCollection.updateOne(filter, updateDoc);
+            res.json(result);
+  })
     
     } finally {
     //   await client.close();
