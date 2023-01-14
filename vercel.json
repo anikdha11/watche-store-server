@@ -7,19 +7,6 @@
     }
   ],
   "routes": [
-    { "src": "/(.*)", "dest": "/" },
-    { "src": "/products", "methods": ["POST"], "dest": "/products" },
-    { "src": "/users", "methods": ["POST"], "dest": "/users" },
-    { "src": "/order", "methods": ["POST"], "dest": "/order" },
-    { "src": "/review", "methods": ["POST"], "dest": "/review" },
-    {
-      "rewrites": [{ "source": "/products/:id", "destination": "/api/product" }]
-    },
-    {
-      "rewrites": [{ "source": "/users/:email", "destination": "/api/users" }]
-    },
-    {
-      "rewrites": [{ "source": "/order/:id", "destination": "/api/order" }]
-    }
+    { "src": "/(.*)", "dest": "/" }
   ]
 }
